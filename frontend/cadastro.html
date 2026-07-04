@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cadastro de Produtos</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:#e8e8e8;color:#222;}div.topbar{background:#4a4a4a;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #333;}div.topbar h1{color:#f0f0f0;font-size:16px;font-weight:700;text-transform:uppercase;}div.topbar nav a{color:#ccc;font-size:12px;text-decoration:none;margin-left:16px;text-transform:uppercase;}div.topbar nav a:hover{color:#fff;}div.container{max-width:1100px;margin:24px auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}div.card{background:#f5f5f5;border-radius:4px;padding:20px;margin-bottom:16px;border:1px solid #ccc;box-shadow:0 1px 3px rgba(0,0,0,0.1);}div.card h2{font-size:13px;color:#555;margin-bottom:16px;border-bottom:1px solid #ddd;padding-bottom:8px;text-transform:uppercase;}label{display:block;color:#555;font-size:11px;margin-bottom:4px;margin-top:12px;text-transform:uppercase;}input{width:100%;padding:8px 10px;background:#fff;border:1px solid #bbb;border-radius:2px;color:#222;font-size:13px;outline:none;}input:focus{border-color:#666;}div.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}button.btn{margin-top:10px;padding:9px;border:none;border-radius:2px;font-size:12px;font-weight:700;cursor:pointer;width:100%;text-transform:uppercase;}button.btn-primary{background:#4a4a4a;color:#f0f0f0;}button.btn-primary:hover{background:#333;}button.btn-secondary{background:#888;color:#f0f0f0;}button.btn-secondary:hover{background:#666;}div.msg{margin-top:10px;padding:8px 10px;border-radius:2px;font-size:12px;display:none;}div.msg.erro{background:#f5d0d0;color:#8b0000;border:1px solid #c09090;display:block;}div.msg.ok{background:#d0f5d0;color:#1a5a1a;border:1px solid #90c090;display:block;}div.resultados{margin-top:6px;background:#fff;border-radius:2px;display:none;border:1px solid #bbb;}div.resultado-item{padding:8px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid #eee;}div.resultado-item:hover{background:#e8e8e8;}table{width:100%;border-collapse:collapse;font-size:12px;}th{text-align:left;color:#555;padding:7px 8px;border-bottom:2px solid #ccc;font-size:11px;text-transform:uppercase;background:#e0e0e0;}td{padding:8px;border-bottom:1px solid #ddd;color:#333;}tr:hover td{background:#ececec;}div.full{grid-column:1/-1;}</style>
+</head>
+<body>
+<div class="topbar"><h1>Loja de Eletronicos</h1><nav><a href="/static/cadastro.html">Cadastro</a><a href="/static/entrada.html">Entrada</a><a href="/static/venda.html">Venda</a><a href="/static/historico.html">Historico</a></nav></div>
+<div class="container">
+<div class="card">
+<h2>Cadastrar Produto</h2>
+<label>Nome do produto</label><input type="text" id="nome" placeholder="Ex: Samsung Galaxy S24">
+<label>Codigo</label><input type="text" id="codigo" placeholder="Ex: SAM-S24-001">
+<label>Preco</label><input type="number" id="preco" placeholder="Ex: 3999.99" step="0.01">
+<div class="row">
+  <div><label>Corredor</label><input type="text" id="corredor" placeholder="Ex: A"></div>
+  <div><label>Prateleira</label><input type="text" id="prateleira" placeholder="Ex: 3"></div>
+</div>
+<button class="btn btn-primary" onclick="cadastrar()">Cadastrar Produto</button>
+<button class="btn btn-secondary" onclick="limpar()">Limpar</button>
+<div class="msg" id="msg"></div>
+</div>
+<div class="card">
+<h2>Editar Produto</h2>
+<label>Buscar por nome ou codigo</label>
+<input type="text" id="edit-busca" placeholder="Ex: Samsung ou SAM-S24-001">
+<button class="btn btn-secondary" onclick="buscarParaEditar()">Buscar</button>
+<div class="resultados" id="edit-resultados"></div>
+<div id="edit-form" style="display:none">
+  <label>Nome</label><input type="text" id="edit-nome">
+  <label>Preco</label><input type="number" id="edit-preco" step="0.01">
+  <div class="row">
+    <div><label>Corredor</label><input type="text" id="edit-corredor"></div>
+    <div><label>Prateleira</label><input type="text" id="edit-prateleira"></div>
+  </div>
+  <button class="btn btn-primary" onclick="salvarEdicao()">Salvar Alteracoes</button>
+</div>
+<div class="msg" id="msg-edit"></div>
+</div>
+<div class="card full">
+<h2>Produtos Cadastrados</h2>
+<table><thead><tr><th>Codigo</th><th>Nome</th><th>Preco</th><th>Corredor</th><th>Prateleira</th><th>Estoque</th></tr></thead>
+<tbody id="tabela"></tbody></table>
+</div>
+</div>
+<script>
+const API="http://127.0.0.1:8000";
+const token=localStorage.getItem("token");
+if(!token)window.location.href="/static/index.html";
+const headers={"Content-Type":"application/json","Authorization":"Bearer "+token};
+let codigoEditando=null;
+
+async function carregarProdutos(){
+  const res=await fetch(API+"/produtos/",{headers});
+  if(res.status===401){window.location.href="/static/index.html";return;}
+  const dados=await res.json();
+  const tbody=document.getElementById("tabela");
+  tbody.innerHTML="";
+  dados.forEach(p=>{
+    tbody.innerHTML+="<tr><td>"+p.codigo+"</td><td>"+p.nome+"</td><td>R$ "+p.preco.toFixed(2)+"</td><td>"+(p.corredor||"-")+"</td><td>"+(p.prateleira||"-")+"</td><td>"+p.quantidade+"</td></tr>";
+  });
+}
+
+async function cadastrar(){
+  const msg=document.getElementById("msg");
+  msg.className="msg";
+  const body={nome:document.getElementById("nome").value,codigo:document.getElementById("codigo").value,preco:parseFloat(document.getElementById("preco").value),corredor:document.getElementById("corredor").value||null,prateleira:document.getElementById("prateleira").value||null};
+  const res=await fetch(API+"/produtos/",{method:"POST",headers,body:JSON.stringify(body)});
+  const data=await res.json();
+  if(!res.ok){msg.className="msg erro";msg.textContent=data.detail||"Erro ao cadastrar";return;}
+  msg.className="msg ok";msg.textContent="Produto cadastrado!";limpar();carregarProdutos();
+}
+
+function limpar(){["nome","codigo","preco","corredor","prateleira"].forEach(id=>document.getElementById(id).value="");}
+
+async function buscarParaEditar(){
+  const q=document.getElementById("edit-busca").value;
+  if(!q)return;
+  const res=await fetch(API+"/produtos/buscar/?q="+encodeURIComponent(q),{headers});
+  const dados=await res.json();
+  const div=document.getElementById("edit-resultados");
+  div.innerHTML="";
+  if(!dados.length){div.style.display="block";div.innerHTML="<div class=resultado-item>Nenhum produto encontrado</div>";return;}
+  div.style.display="block";
+  dados.forEach(p=>{
+    const item=document.createElement("div");
+    item.className="resultado-item";
+    item.textContent=p.nome+" ("+p.codigo+")";
+    item.onclick=()=>selecionarParaEditar(p);
+    div.appendChild(item);
+  });
+}
+
+function selecionarParaEditar(p){
+  codigoEditando=p.codigo;
+  document.getElementById("edit-nome").value=p.nome;
+  document.getElementById("edit-preco").value=p.preco;
+  document.getElementById("edit-corredor").value=p.corredor||"";
+  document.getElementById("edit-prateleira").value=p.prateleira||"";
+  document.getElementById("edit-form").style.display="block";
+  document.getElementById("edit-resultados").style.display="none";
+}
+
+async function salvarEdicao(){
+  const msg=document.getElementById("msg-edit");
+  msg.className="msg";
+  const body={nome:document.getElementById("edit-nome").value,preco:parseFloat(document.getElementById("edit-preco").value),corredor:document.getElementById("edit-corredor").value||null,prateleira:document.getElementById("edit-prateleira").value||null};
+  const res=await fetch(API+"/produtos/"+codigoEditando,{method:"PATCH",headers,body:JSON.stringify(body)});
+  const data=await res.json();
+  if(!res.ok){msg.className="msg erro";msg.textContent=data.detail||"Erro ao editar";return;}
+  msg.className="msg ok";msg.textContent="Produto atualizado!";carregarProdutos();
+}
+
+document.getElementById("edit-busca").addEventListener("keydown",e=>{if(e.key==="Enter")buscarParaEditar();});
+carregarProdutos();
+</script>
+</body>
+</html>

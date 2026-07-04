@@ -1,0 +1,16 @@
+﻿services:
+  db:
+    image: postgres:15
+    container_name: loja_db
+    restart: always
+    environment:
+      POSTGRES_DB: loja
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5433:5432"
+    volumes:
+      - loja_data:/var/lib/postgresql/data
+
+volumes:
+  loja_data:

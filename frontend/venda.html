@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Venda</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;background:#e8e8e8;color:#222;}div.topbar{background:#4a4a4a;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #333;}div.topbar h1{color:#f0f0f0;font-size:16px;font-weight:700;text-transform:uppercase;}div.topbar nav a{color:#ccc;font-size:12px;text-decoration:none;margin-left:16px;text-transform:uppercase;}div.topbar nav a:hover{color:#fff;}div.container{max-width:1100px;margin:24px auto;padding:0 20px;}div.card{background:#f5f5f5;border-radius:4px;padding:20px;margin-bottom:16px;border:1px solid #ccc;box-shadow:0 1px 3px rgba(0,0,0,0.1);}div.card h2{font-size:13px;color:#555;margin-bottom:16px;border-bottom:1px solid #ddd;padding-bottom:8px;text-transform:uppercase;}label{display:block;color:#555;font-size:11px;margin-bottom:4px;margin-top:12px;text-transform:uppercase;}input,textarea{width:100%;padding:8px 10px;background:#fff;border:1px solid #bbb;border-radius:2px;color:#222;font-size:13px;outline:none;}input:focus{border-color:#666;}div.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}div.full{grid-column:1/-1;}button.btn{margin-top:10px;padding:9px;border:none;border-radius:2px;font-size:12px;font-weight:700;cursor:pointer;width:100%;text-transform:uppercase;}button.btn-primary{background:#4a4a4a;color:#f0f0f0;}button.btn-primary:hover{background:#333;}button.btn-secondary{background:#888;color:#f0f0f0;}button.btn-secondary:hover{background:#666;}button.btn-success{background:#3a6a3a;color:#e0f0e0;}button.btn-success:hover{background:#2d5a2d;}button.btn-danger{background:#6a3a3a;color:#f0e0e0;margin-top:6px;}button.btn-danger:hover{background:#5a2d2d;}div.msg{margin-top:10px;padding:8px 10px;border-radius:2px;font-size:12px;display:none;}div.msg.erro{background:#f5d0d0;color:#8b0000;border:1px solid #c09090;display:block;}div.msg.ok{background:#d0f5d0;color:#1a5a1a;border:1px solid #90c090;display:block;}div.resultados{margin-top:6px;background:#fff;border-radius:2px;display:none;border:1px solid #bbb;}div.resultado-item{padding:8px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid #eee;}div.resultado-item:hover{background:#e8e8e8;}table{width:100%;border-collapse:collapse;font-size:12px;}th{text-align:left;color:#555;padding:7px 8px;border-bottom:2px solid #ccc;font-size:11px;text-transform:uppercase;background:#e0e0e0;}td{padding:8px;border-bottom:1px solid #ddd;color:#333;}tr:hover td{background:#ececec;}div.badge{display:inline-block;padding:2px 6px;border-radius:2px;font-size:10px;font-weight:700;}div.badge-pix{background:#cce0f0;color:#1a5a8a;}div.badge-credito{background:#ccf0cc;color:#1a5a1a;}div.badge-debito{background:#ccccf0;color:#1a1a8a;}div.badge-dinheiro{background:#f0f0cc;color:#5a5a1a;}div.produto-info{margin-top:10px;padding:10px;background:#fff;border-radius:2px;display:none;border:1px solid #ccc;}div.produto-info p{font-size:12px;color:#666;margin-bottom:3px;}div.produto-info span{color:#222;font-weight:700;}div.total-box{background:#fff;border-radius:2px;padding:14px;margin-top:14px;text-align:center;border:2px solid #bbb;}div.total-box span{font-size:28px;font-weight:700;color:#222;}div.pagamento{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:10px;}button.pag{padding:12px;border:2px solid #bbb;border-radius:2px;background:#f5f5f5;color:#555;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase;}button.pag:hover{border-color:#444;color:#222;}button.pag.ativo{border-color:#333;color:#fff;background:#4a4a4a;}div.itens-detalhe{background:#fff;padding:10px;border-radius:2px;margin-top:4px;display:none;font-size:11px;color:#555;border:1px solid #ddd;}button.ver-itens{background:#fff;border:1px solid #bbb;color:#555;padding:3px 6px;border-radius:2px;cursor:pointer;font-size:10px;text-transform:uppercase;}button.ver-itens:hover{border-color:#444;color:#222;}</style></head><body><div class="topbar"><h1>Loja de Eletronicos</h1><nav><a href="cadastro.html">Cadastro</a><a href="entrada.html">Entrada</a><a href="venda.html">Venda</a><a href="historico.html">Historico</a></nav></div><div class="container"><div class="card"><h2>Adicionar Produto</h2><label>Buscar por nome ou codigo</label><input type="text" id="busca" placeholder="Ex: Samsung ou SAM-S24-001"><button class="btn btn-secondary" onclick="buscarProdutos()">Buscar</button><div class="resultados" id="resultados"></div><div id="add-form" style="display:none"><label>Quantidade</label><input type="number" id="quantidade" placeholder="Ex: 1" min="1" value="1"><button class="btn btn-primary" onclick="adicionarItem()">Adicionar a NF</button></div><div class="msg" id="msg-busca"></div><h2 style="margin-top:24px">Itens da NF</h2><table><thead><tr><th>Produto</th><th>Qtd</th><th>Preco Unit</th><th>Subtotal</th><th></th></tr></thead><tbody id="itens"></tbody></table><div class="total-box"><p style="color:#64748b;font-size:13px;margin-bottom:4px">TOTAL</p><span id="total">R$ 0,00</span></div></div><div class="card"><h2>Pagamento</h2><div class="pagamento"><button class="pag" id="pag-pix" onclick="selecionarPagamento(this,'pix')">PIX</button><button class="pag" id="pag-cartao" onclick="selecionarPagamento(this,'cartao_credito')">Credito</button><button class="pag" id="pag-dinheiro" onclick="selecionarPagamento(this,'dinheiro')">Dinheiro</button><button class="pag" id="pag-debito" onclick="selecionarPagamento(this,'cartao_debito')">Debito</button></div><div id="troco-box" style="display:none;margin-top:16px"><label>Valor recebido</label><input type="number" id="valor-recebido" placeholder="Ex: 50.00" step="0.01" oninput="calcularTroco()"><div style="margin-top:8px;padding:12px;background:#0f172a;border-radius:8px"><p style="color:#94a3b8;font-size:12px">TROCO</p><p id="troco" style="font-size:20px;font-weight:700;color:#86efac">R$ 0,00</p></div></div><button class="btn btn-success" style="margin-top:24px" onclick="finalizarVenda()">Finalizar Venda</button><button class="btn btn-danger" onclick="cancelarVenda()">Cancelar</button><div class="msg" id="msg-venda"></div></div></div><script>
+const API="http://127.0.0.1:8000";
+const token=localStorage.getItem("token");
+if(!token)window.location.href="index.html";
+const headers={"Content-Type":"application/json","Authorization":"Bearer "+token};
+let itens=[];
+let produtoSelecionado=null;
+let formaPagamento=null;
+
+async function buscarProdutos(){
+  const q=document.getElementById("busca").value;
+  if(!q)return;
+  const res=await fetch(API+"/produtos/buscar/?q="+encodeURIComponent(q),{headers});
+  const dados=await res.json();
+  const div=document.getElementById("resultados");
+  div.innerHTML="";
+  if(!dados.length){div.style.display="block";div.innerHTML="<div class=resultado-item>Nenhum produto encontrado</div>";return;}
+  div.style.display="block";
+  dados.forEach(p=>{
+    const item=document.createElement("div");
+    item.className="resultado-item";
+    item.textContent=p.nome+" ("+p.codigo+") - Estoque: "+p.quantidade+" - R$ "+p.preco.toFixed(2);
+    item.onclick=()=>selecionarProduto(p);
+    div.appendChild(item);
+  });
+}
+
+function selecionarProduto(p){
+  produtoSelecionado=p;
+  document.getElementById("busca").value=p.nome;
+  document.getElementById("resultados").style.display="none";
+  document.getElementById("add-form").style.display="block";
+  document.getElementById("quantidade").value="1";
+}
+
+function adicionarItem(){
+  if(!produtoSelecionado)return;
+  const qtd=parseInt(document.getElementById("quantidade").value);
+  if(isNaN(qtd)||qtd<1)return;
+  const existente=itens.find(i=>i.codigo===produtoSelecionado.codigo);
+  if(existente){existente.quantidade+=qtd;existente.subtotal=existente.quantidade*existente.preco;}
+  else{itens.push({codigo:produtoSelecionado.codigo,nome:produtoSelecionado.nome,preco:produtoSelecionado.preco,quantidade:qtd,subtotal:produtoSelecionado.preco*qtd});}
+  produtoSelecionado=null;
+  document.getElementById("busca").value="";
+  document.getElementById("add-form").style.display="none";
+  renderItens();
+}
+
+function renderItens(){
+  const tbody=document.getElementById("itens");
+  tbody.innerHTML="";
+  let total=0;
+  itens.forEach((it,i)=>{
+    total+=it.subtotal;
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td>"+it.nome+"</td><td>"+it.quantidade+"</td><td>R$ "+it.preco.toFixed(2)+"</td><td>R$ "+it.subtotal.toFixed(2)+"</td><td><button onclick='removerItem("+i+")' style='background:#450a0a;color:#fca5a5;border:none;border-radius:4px;padding:4px 8px;cursor:pointer'>X</button></td>";
+    tbody.appendChild(tr);
+  });
+  document.getElementById("total").textContent="R$ "+total.toFixed(2).replace(".",",");
+}
+
+function removerItem(i){itens.splice(i,1);renderItens();}
+
+function selecionarPagamento(btn,forma){
+  formaPagamento=forma;
+  document.querySelectorAll(".pag").forEach(b=>b.classList.remove("ativo"));
+  btn.classList.add("ativo");
+  document.getElementById("troco-box").style.display=forma==="dinheiro"?"block":"none";
+}
+
+function calcularTroco(){
+  const total=itens.reduce((s,i)=>s+i.subtotal,0);
+  const recebido=parseFloat(document.getElementById("valor-recebido").value)||0;
+  const troco=recebido-total;
+  document.getElementById("troco").textContent="R$ "+(troco>=0?troco:0).toFixed(2).replace(".",",");
+}
+
+async function finalizarVenda(){
+  const msg=document.getElementById("msg-venda");
+  msg.className="msg";
+  if(!itens.length){msg.className="msg erro";msg.textContent="Adicione pelo menos um produto";return;}
+  if(!formaPagamento){msg.className="msg erro";msg.textContent="Selecione a forma de pagamento";return;}
+  const body={itens:itens.map(i=>({codigo_produto:i.codigo,quantidade:i.quantidade})),forma_pagamento:formaPagamento};
+  const res=await fetch(API+"/vendas/",{method:"POST",headers,body:JSON.stringify(body)});
+  const data=await res.json();
+  if(!res.ok){msg.className="msg erro";msg.textContent=data.detail||"Erro ao finalizar venda";return;}
+  msg.className="msg ok";
+  msg.textContent="Venda finalizada! Total: R$ "+data.total.toFixed(2).replace(".",",");
+  itens=[];formaPagamento=null;
+  document.querySelectorAll(".pag").forEach(b=>b.classList.remove("ativo"));
+  document.getElementById("troco-box").style.display="none";
+  renderItens();
+}
+
+function cancelarVenda(){
+  itens=[];formaPagamento=null;
+  document.querySelectorAll(".pag").forEach(b=>b.classList.remove("ativo"));
+  document.getElementById("troco-box").style.display="none";
+  renderItens();
+  document.getElementById("msg-venda").className="msg";
+}
+
+document.getElementById("busca").addEventListener("keydown",e=>{if(e.key==="Enter")buscarProdutos();});
+</script></body></html>
